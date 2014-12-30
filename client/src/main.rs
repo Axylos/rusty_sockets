@@ -5,9 +5,11 @@ fn main() {
     let port = 8080u16;
     let mut socket = TcpStream::connect(host);
     println!("connecting to server");
-    socket.write(b"Get / HTTP/1.0\n\n");
+    let msg = b"would you like to play a game?\n\n";
+    socket.write(msg);
     println!("writing to server");
     let response = socket.read_to_end();
-    println!("response: \n{}\n", response);
+    let parsed_response = String::from_utf8(response.ok().unwrap()).ok().unwrap();
+    println!("response: \n{}\n", parsed_response);
     println!("\n done");
 }
