@@ -11,8 +11,9 @@ fn main() {
     let mut acceptor = listener.listen();
 
     fn double_write<W: Writer>(mut stream: BufferedWriter<W>, output: &[u8]) {
-        stream.write(output);
         stream.write(b"\nstuff\n");
+        stream.write(output);
+        stream.write(output);
     }
 
     fn handle_req<'a, R: Reader>(mut stream: BufferedReader<R>) -> String {
