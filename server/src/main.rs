@@ -1,32 +1,46 @@
-    use std::str::from_utf8;
-    use std::io::net::tcp::TcpAcceptor;
-    use std::io::{Acceptor, Listener, TcpListener, TcpStream };
+    use std::io::{BufferedReader, BufferedWriter, Acceptor, Listener, TcpListener};
     use std::thread::Thread;
 
 
 fn main() {
     println!("called");
 
-    let mut listener = TcpListener::bind("127.0.0.1:8080").ok().unwrap();
-    //let s_name = listener.socket_name();
-    //println!("{}", s_name);
+    let listener = TcpListener::bind("ec2-54-148-208-119.us-west-2.compute.amazonaws.com:8080").ok().unwrap();
 
-
-    //bind listener to address
 
     let mut acceptor = listener.listen().unwrap();
-    let mut buf = [0u8, ..1024];
 
-    fn handle_client(mut stream: TcpStream) {
-
-        println!("connection received");
+    fn double_write<W: Writer>(mut stream: BufferedWriter<W>, output: &[u8]) {
+        stream.write(output);
+        stream.write(b"\nstuff\n");
     }
+
+    fn handle_req<'a, R: Reader>(mut stream: BufferedReader<R>) -> String {
+        println!("connection received\n reading");
+
+        match stream.read_line() {
+            Ok(nread) => {
+                println!("Read {}", nread);
+                let str = nread;
+                return str;
+            }
+            Err(e) => {
+                println!("error reading: {}", e);
+                return b"failure".to_string();
+            }
+
+        }
+    }
+
 
     for stream in acceptor.incoming() {
         match stream {
             Err(e) => { /* connectoin failed */ }
             Ok(stream) => Thread::spawn(move|| {
-                handle_client(stream)
+                let reader = BufferedReader::new(stream.clone());
+                let writer = BufferedWriter::new(stream.clone());
+                let input = handle_req(reader);
+                double_write(writer, input.as_bytes());
             }).detach()
         }
     }
