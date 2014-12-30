@@ -8,7 +8,7 @@ fn main() {
     let listener = TcpListener::bind("ec2-54-148-208-119.us-west-2.compute.amazonaws.com:8080").ok().unwrap();
 
 
-    let mut acceptor = listener.listen().unwrap();
+    let mut acceptor = listener.listen();
 
     fn double_write<W: Writer>(mut stream: BufferedWriter<W>, output: &[u8]) {
         stream.write(output);
