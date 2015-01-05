@@ -1,11 +1,30 @@
-    use std::io::{BufferedReader, BufferedWriter, Acceptor, Listener, TcpListener};
-    use std::thread::Thread;
+extern crate getopts;
+use std::io::{BufferedReader, BufferedWriter, Acceptor, Listener, TcpListener};
+use std::thread::Thread;
+use getopts::{optopt, getopts};
+use std::os;
 
 
 fn main() {
     println!("called");
 
-    let listener = TcpListener::bind("ec2-54-148-208-119.us-west-2.compute.amazonaws.com:8080").ok().unwrap();
+    let args: Vec<String> = os::args();
+
+    let opts = &[
+        optopt("p", "", "port", "connect to this port")
+    ];
+
+    let matches = match getopts(args.tail(), opts) {
+        Ok(m) => { m },
+        Err(f) => { panic!(f.to_string()) },
+    };
+
+    let port = match matches.opt_present("p") {
+        true => matches.opt_str("p").unwrap().parse().unwrap(),
+        false => 80u16,
+    };
+
+    let listener = TcpListener::bind(("127.0.0.1", port)).ok().unwrap();
 
 
     let mut acceptor = listener.listen();
