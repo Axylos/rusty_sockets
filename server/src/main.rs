@@ -11,12 +11,19 @@ fn main() {
     let args: Vec<String> = os::args();
 
     let opts = &[
-        optopt("p", "", "port", "connect to this port")
+        optopt("p", "", "port", "connect to this port"),
+        optopt("s", "", "server", "connect to this host server")
     ];
+
 
     let matches = match getopts(args.tail(), opts) {
         Ok(m) => { m },
         Err(f) => { panic!(f.to_string()) },
+    };
+
+    let host = match matches.opt_present("s") {
+        true => matches.opt_str("s").unwrap(),
+        false => "ec2-54-148-208-119.us-west-2.compute.amazonaws.com".to_string(),
     };
 
     let port = match matches.opt_present("p") {
@@ -24,7 +31,7 @@ fn main() {
         false => 80u16,
     };
 
-    let listener = match TcpListener::bind(("127.0.0.1", port)) {
+    let listener = match TcpListener::bind((host.as_slice(), port)) {
         Ok(m) => { m }
         Err(f) => { panic!("port probably in use: {}", f) }
     };
@@ -58,7 +65,7 @@ fn main() {
 
     for stream in acceptor.incoming() {
         match stream {
-            Err(e) => { /* connectoin failed */ }
+            Err(e) => { println!("connectoin failed: {}", e) }
             Ok(stream) => Thread::spawn(move|| {
                 let reader = BufferedReader::new(stream.clone());
                 let writer = BufferedWriter::new(stream.clone());

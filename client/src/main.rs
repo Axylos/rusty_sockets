@@ -21,6 +21,8 @@ fn main() {
         false => "ec2-54-148-208-119.us-west-2.compute.amazonaws.com".to_string(),
     };
 
+    println!("{}", host);
+
     let port = match matches.opt_present("p") {
         true => (matches.opt_str("p")).unwrap().parse().unwrap(),
         false => 80u16,
@@ -32,7 +34,12 @@ fn main() {
     socket.write(msg);
     println!("writing to server");
     let response = socket.read_to_end();
-    let parsed_response = String::from_utf8(response.ok().unwrap()).ok().unwrap();
+    let response = match response {
+        Ok(m) => { m },
+        Err(f) => { panic!(f.to_string()) }
+    };
+
+    let parsed_response = String::from_utf8(response).ok().unwrap();
     println!("response: \n{}\n", parsed_response);
     println!("\n done");
 }
