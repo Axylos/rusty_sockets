@@ -24,11 +24,10 @@ fn main() {
         false => 80u16,
     };
 
-    let listener = TcpListener::bind(("127.0.0.1", port));
-    match TcpListener::bind(("127.0.0.1", port)) {
-        Ok(m) => { let listener = m; }
-        Err(f) => { panic!("port probably in use") }
-    }
+    let listener = match TcpListener::bind(("127.0.0.1", port)) {
+        Ok(m) => { m }
+        Err(f) => { panic!("port probably in use: {}", f) }
+    };
 
 
     let mut acceptor = listener.listen();
