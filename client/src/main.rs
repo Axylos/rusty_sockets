@@ -2,6 +2,7 @@ extern crate getopts;
 use std::io::TcpStream;
 use getopts::{optopt, optflag, getopts, OptGroup, usage};
 use std::os;
+use std::io;
 
 fn main() {
     let args: Vec<String> = os::args();
@@ -28,12 +29,19 @@ fn main() {
         false => 80u16,
     };
 
-    let mut socket = TcpStream::connect((host.as_slice(), port));
+    let mut read_stream = TcpStream::connect((host.as_slice(), port));
+    let mut write_stream = read_stream.clone();
     println!("connecting to server");
-    let msg = b"would you like to play a game?\n\n";
-    socket.write(msg);
     println!("writing to server");
-    let response = socket.read_to_end();
+    let msg = b"would you like to play a game?\n\n";
+
+
+    let first  = io::stdin().read_until(b'\n').ok().unwrap();
+    write_stream.write(format!("{}\x04", String::from_utf8(first).ok().unwrap()).as_slice().as_bytes());
+    let second  = io::stdin().read_until(b'\n').ok().unwrap();
+    write_stream.write(format!("{}\x04", String::from_utf8(second).ok().unwrap()).as_slice().as_bytes());
+
+    let response = read_stream.read_to_end();
     let response = match response {
         Ok(m) => { m },
         Err(f) => { panic!(f.to_string()) }
