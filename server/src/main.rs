@@ -3,6 +3,7 @@ use server::build_socket_addr::build_address as b_addr;
 use std::io::{BufferedReader, BufferedWriter, Acceptor, Listener, TcpListener};
 use std::thread::Thread;
 use std::os;
+use server::boot_server::handle_stream as handle_stream;
 
 
 

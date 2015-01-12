@@ -36,7 +36,7 @@ fn double_read<'a, R: Reader>(mut stream: BufferedReader<R>) {
 
 }
 
-fn handle_stream(mut stream: TcpStream) {
+pub fn handle_stream(mut stream: TcpStream) {
     let input_reader = BufferedReader::new(stream.clone());
     let writer = BufferedWriter::new(stream.clone());
 
