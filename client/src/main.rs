@@ -47,14 +47,16 @@ fn main() {
     let mut reader = BufferedReader::new(read_stream.clone());
     println!("running");
     loop {
+        println!("loop started");
         let response = reader.read_until(b'\x04');
+        println!("read ended");
         match response {
             Ok(m) => { 
                 let parsed_response = String::from_utf8(m).unwrap();
                 println!("response: \n{}\n", parsed_response);
 
             },
-            _ => { }
+            _ => { println!("failed out") }
         };
 
             }

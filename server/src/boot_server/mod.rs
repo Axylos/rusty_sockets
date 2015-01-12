@@ -60,6 +60,7 @@ pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'sta
             println!("received message: {}", j.msg);
             writer.write(j.msg.as_bytes());
             writer.write_u8(b'\x04');
+            writer.flush();
         }
 }
 
