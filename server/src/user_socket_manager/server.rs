@@ -1,11 +1,16 @@
 use std::io::net::pipe::UnixListener;
 use std::io::{Listener, Acceptor};
 use std::sync::mpsc::{Sender};
+use std::io::fs;
+use std::io::fs::PathExtensions;
 use super::Message;
 
 
 pub fn boot_server(mut sender: Sender<Message<'static>>) {
     let server = Path::new("/var/run/rusty/serv_socket.sock");
+    if server.exists() {
+        fs::unlink(&server).unwrap();
+    }
     let bound_serv = UnixListener::bind(&server); 
     let stream = match bound_serv {
         Ok(stream) => {
@@ -13,7 +18,6 @@ pub fn boot_server(mut sender: Sender<Message<'static>>) {
 
             for mut client in stream.listen().incoming() {
                 let msg = "1, 2, 3, 4";
-                println!("{}", &msg);
                 client.write(msg.as_bytes());
                 println!("wrote some stuff");
             }

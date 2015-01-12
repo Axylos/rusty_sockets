@@ -52,17 +52,18 @@ pub fn handle_stream(mut stream: TcpStream) {
 }
 
 pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'static>>) {
-    loop {
-    let writer = BufferedWriter::new(stream.clone());
-    let j = receiver.recv().unwrap();
-    println!("{}", j.msg);
-    double_write(writer, j.msg.as_bytes());
-    }
+        let mut writer = BufferedWriter::new(stream.clone());
+        writer.write_u8(b'\x10');
+        println!("wrote byte");
+        let j = receiver.recv().unwrap();
+        println!("{}", j.msg);
+        writer.write(j.msg.as_bytes());
+        writer.write_u8(b'\x04');
 }
 
 pub fn take_sender(mut sender: Sender<Message<'static>>) {
     println!("bye");
-    let msg: Message = Message { msg: "hi there" } ;
+    let msg: Message = Message { msg: "whoa" } ;
     sender.send(msg);
     boot_server(sender.clone());
 }
