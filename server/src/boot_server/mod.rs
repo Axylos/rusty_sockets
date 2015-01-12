@@ -2,11 +2,13 @@ use std::io::{BufferedReader, BufferedWriter, Acceptor, Listener, TcpListener};
 
 use std::io::net::tcp::TcpStream as TcpStream;
 use std::thread::Thread;
+use std::sync::mpsc::{Sender, Receiver, channel};
+use user_socket_manager::Message;
+use user_socket_manager::server::boot_server;
 
-fn double_write<W: Writer>(mut stream: BufferedWriter<W>, output: &[u8]) {
-        stream.write(b"\nstuff\n");
+pub fn double_write<W: Writer>(mut stream: BufferedWriter<W>, output: &[u8]) {
         stream.write(output);
-        stream.write(output);
+        stream.write(b"\x04");
 }
 
 fn handle_req<'a, R: Reader>(mut stream: BufferedReader<R>) -> String {
@@ -48,3 +50,21 @@ pub fn handle_stream(mut stream: TcpStream) {
 
     println!("called");
 }
+
+pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'static>>) {
+    loop {
+    let writer = BufferedWriter::new(stream.clone());
+    let j = receiver.recv().unwrap();
+    println!("{}", j.msg);
+    double_write(writer, j.msg.as_bytes());
+    }
+}
+
+pub fn take_sender(mut sender: Sender<Message<'static>>) {
+    println!("bye");
+    let msg: Message = Message { msg: "hi there" } ;
+    sender.send(msg);
+    boot_server(sender.clone());
+}
+
+

@@ -3,6 +3,7 @@ use std::io::TcpStream;
 use getopts::{optopt, optflag, getopts, OptGroup, usage};
 use std::os;
 use std::io;
+use std::io::BufferedReader;
 
 fn main() {
     let args: Vec<String> = os::args();
@@ -36,18 +37,25 @@ fn main() {
     let msg = b"would you like to play a game?\n\n";
 
 
+    /*
     let first  = io::stdin().read_until(b'\n').ok().unwrap();
     write_stream.write(format!("{}\x04", String::from_utf8(first).ok().unwrap()).as_slice().as_bytes());
     let second  = io::stdin().read_until(b'\n').ok().unwrap();
     write_stream.write(format!("{}\x04", String::from_utf8(second).ok().unwrap()).as_slice().as_bytes());
 
-    let response = read_stream.read_to_end();
-    let response = match response {
-        Ok(m) => { m },
-        Err(f) => { panic!(f.to_string()) }
-    };
+    */
+    let mut reader = BufferedReader::new(read_stream.clone());
+    println!("running");
+    loop {
+        let response = reader.read_until(b'\x04');
+        match response {
+            Ok(m) => { 
+                let parsed_response = String::from_utf8(m).unwrap();
+                println!("response: \n{}\n", parsed_response);
 
-    let parsed_response = String::from_utf8(response).ok().unwrap();
-    println!("response: \n{}\n", parsed_response);
-    println!("\n done");
+            },
+            _ => { }
+        };
+
+            }
 }
