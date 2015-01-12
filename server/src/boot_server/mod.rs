@@ -54,11 +54,13 @@ pub fn handle_stream(mut stream: TcpStream) {
 pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'static>>) {
         let mut writer = BufferedWriter::new(stream.clone());
         writer.write_u8(b'\x10');
-        println!("wrote byte");
-        let j = receiver.recv().unwrap();
-        println!("{}", j.msg);
-        writer.write(j.msg.as_bytes());
-        writer.write_u8(b'\x04');
+        loop {
+            println!("wrote byte");
+            let j = receiver.recv().unwrap();
+            println!("received message: {}", j.msg);
+            writer.write(j.msg.as_bytes());
+            writer.write_u8(b'\x04');
+        }
 }
 
 pub fn take_sender(mut sender: Sender<Message<'static>>) {

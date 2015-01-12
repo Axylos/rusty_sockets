@@ -17,8 +17,8 @@ pub fn boot_server(mut sender: Sender<Message<'static>>) {
             println!("bound");
 
             for mut client in stream.listen().incoming() {
-                let msg = "1, 2, 3, 4";
-                client.write(msg.as_bytes());
+                let msg: Message = Message { msg: "1, 2, 3, 4" };
+                sender.send(msg);
                 println!("wrote some stuff");
             }
         },
