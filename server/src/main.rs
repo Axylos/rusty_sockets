@@ -6,7 +6,6 @@ use std::os;
 use server::boot_server::handle_stream as handle_stream;
 use server::boot_server::{take_receiver, take_sender};
 use std::sync::mpsc::{channel, Sender, Receiver};
-use server::user_socket_manager::Message;
 
 fn main() {
     println!("called");

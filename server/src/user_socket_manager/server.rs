@@ -4,6 +4,7 @@ use std::sync::mpsc::{Sender};
 use std::io::fs;
 use std::io::fs::PathExtensions;
 use super::Message;
+use std::io::BufferedReader;
 
 
 pub fn boot_server(mut sender: Sender<Message<'static>>) {
@@ -17,7 +18,10 @@ pub fn boot_server(mut sender: Sender<Message<'static>>) {
             println!("bound");
 
             for mut client in stream.listen().incoming() {
-                let msg: Message = Message { msg: "1, 2, 3, 4" };
+                let mut reader = BufferedReader::new(client.clone());
+                let words = reader.read_until(b'\x04');
+                let parsed_words = String::from_utf8(words.unwrap()).unwrap();
+                let msg: Message<'static> = Message { msg: parsed_words };
                 sender.send(msg);
                 println!("wrote some stuff");
             }

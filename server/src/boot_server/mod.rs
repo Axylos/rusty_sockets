@@ -51,7 +51,7 @@ pub fn handle_stream(mut stream: TcpStream) {
     println!("called");
 }
 
-pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'static>>) {
+pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message>) {
         let mut writer = BufferedWriter::new(stream.clone());
         writer.write_u8(b'\x10');
         loop {
@@ -64,9 +64,9 @@ pub fn take_receiver(mut stream: TcpStream, mut receiver: Receiver<Message <'sta
         }
 }
 
-pub fn take_sender(mut sender: Sender<Message<'static>>) {
+pub fn take_sender(mut sender: Sender<Message>) {
     println!("bye");
-    let msg: Message = Message { msg: "whoa" } ;
+    let msg: Message = Message { msg: "whoa".to_string() } ;
     sender.send(msg);
     boot_server(sender.clone());
 }
