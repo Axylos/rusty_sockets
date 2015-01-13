@@ -1,0 +1,5 @@
+[package]
+
+name = "unix_client"
+version = "0.0.1"
+authors = ["Drake Talley <robertdraketalley@gmail.com>"]
