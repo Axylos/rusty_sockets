@@ -8,3 +8,5 @@ cd ../usr_client/unix_client
 cargo build
 
 cd ..
+
+echo "done building. creating tarballs"
